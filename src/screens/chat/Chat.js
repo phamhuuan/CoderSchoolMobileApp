@@ -10,29 +10,15 @@ import {
 } from 'react-native';
 import {normalize} from '../../utils/Utils';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {GiftedChat, Bubble} from 'react-native-gifted-chat';
+import {GiftedChat, Bubble, InputToolbar, Send} from 'react-native-gifted-chat';
 import {FlatList} from 'react-native';
-
+import Axios from 'axios';
 const fakeData = [
-	{text: 'Bắt đầu'},
-	{text: 'Xin chào'},
-	{text: 'Điểm chuẩn'},
-	{text: 'Lịch thi'},
-	{text: 'Kết thúc'},
-];
-
-const fakeData2 = [
-	{text: 'Hãy gọi 1900561252 để liên hệ với chị Thỏ Ngọc'},
-	{text: 'Rất vui được hỗ trợ bạn'},
-	{
-		text:
-			'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-	},
-	{
-		text:
-			'Hãy truy cập link sau để biết thêm thông tin chi tiết https://google.com',
-	},
-	{text: 'Hẹn gặp lại bạn vào lần sau'},
+	{text: 'Cơ sở địa điểm học'},
+	{text: 'Hình thức tuyển sinh'},
+	{text: 'Thông tin chuyên ngành'},
+	{text: 'Tiếng anh dự bị'},
+	{text: 'Học phí'},
 ];
 
 export default class Chat extends React.Component {
@@ -50,15 +36,7 @@ export default class Chat extends React.Component {
 		Keyboard.addListener('keyboardDidShow', this.keyboardDidShow());
 		Keyboard.addListener('keyboardDidHide', this.keyboardDidHide());
 	}
-	// useEffect(() => {
-	// 	if (isTyping) {
-	// 		return () => {
-	// 			const now = new Date().getTime();
-	// 			while (new Date().getTime() - now < 5000) {}
-	// 			receiveMessage();
-	// 		};
-	// 	}
-	// }, [isTyping, receiveMessage]);
+
 	keyboardDidShow = () => {
 		this.setState({isShowSuggest: false});
 	};
@@ -86,32 +64,38 @@ export default class Chat extends React.Component {
 		<Bubble
 			{...props}
 			wrapperStyle={{
-				left: {backgroundColor: '#f1f1f1'},
-				right: {
-					backgroundColor: '#009d9488',
-					borderWidth: 1,
-					borderColor: '#009d94',
-				},
+				left: {backgroundColor: '#e1e1e1'},
+				right: {backgroundColor: '#ff7373'},
 			}}
 		/>
 	);
 
-	receiveMessage = () => {
-		setTimeout(() => {
-			let currentData = this.state.data;
-			const index = Math.round(Math.random() * 4);
-			currentData.unshift({
-				text: fakeData2[index].text,
-				user: {
-					_id: 1,
-					name: 'Bot',
-				},
-				createdAt: new Date().getTime(),
-				_id: Math.random(),
-			});
-			this.setState({data: [...currentData], isTyping: false});
-		}, 5000);
-	};
+	renderInputToolbar = (props) => (
+		<InputToolbar
+			{...props}
+			containerStyle={{
+				backgroundColor: '#ff7373',
+				paddingVertical: 5,
+			}}
+			primaryStyle={{
+				borderRadius: 20,
+				borderWidth: 0,
+				marginHorizontal: 10,
+				backgroundColor: '#e1e1e1',
+			}}
+		/>
+	);
+
+	renderSend = (props) => (
+		<Send
+			{...props}
+			containerStyle={{
+				backgroundColor: '#e1e1e1',
+				alignItems: 'center',
+				borderRadius: 20,
+			}}
+		/>
+	);
 
 	onSend = (textInput) => {
 		let currentData = this.state.data;
@@ -125,7 +109,31 @@ export default class Chat extends React.Component {
 			_id: Math.random(),
 		});
 		this.setState({data: [...currentData], input: '', isTyping: true}, () => {
-			this.receiveMessage();
+			const config = {
+				header: {
+					'Content-Type': 'application/json',
+					Accept: 'text/plain',
+				},
+			};
+			const body = {
+				sender: 'Rasa',
+				message: textInput,
+			};
+			const url = 'http://34.82.215.81/webhooks/rest/webhook';
+			Axios.post(url, body, config)
+				.then((response) => {
+					currentData.unshift({
+						text: response.data[0].text,
+						user: {
+							_id: 1,
+							name: 'Bot',
+						},
+						createdAt: new Date().getTime(),
+						_id: Math.random(),
+					});
+					this.setState({data: [...currentData], isTyping: false});
+				})
+				.catch((error) => {});
 		});
 	};
 	render() {
@@ -154,15 +162,18 @@ export default class Chat extends React.Component {
 						timeFormat="HH:mm"
 						multiline
 						renderBubble={this.renderBubble}
+						renderInputToolbar={this.renderInputToolbar}
+						renderSend={this.renderSend}
 						renderChatFooter={() => {
 							if (!this.state.isShowSuggest) {
-								return null;
+								return <View />;
 							}
 							return (
 								<View style={styles.suggestItemView}>
 									<FlatList
 										data={fakeData}
 										horizontal
+										keyboardShouldPersistTaps={'always'}
 										keyExtractor={(item) => item.text}
 										renderItem={({item}) => (
 											<TouchableOpacity
@@ -191,7 +202,7 @@ const styles = StyleSheet.create({
 		elevation: 3,
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#6600ee',
+		backgroundColor: '#ff7373',
 	},
 	title: {
 		fontSize: normalize(20),
@@ -215,18 +226,17 @@ const styles = StyleSheet.create({
 		borderColor: '#e0e0e0',
 		textAlignVertical: 'top',
 	},
-	chatView: {flex: 1, backgroundColor: '#ffffff'},
+	chatView: {flex: 1, backgroundColor: '#3e454d'},
 	suggestItem: {
 		borderRadius: 16,
-		backgroundColor: '#6600ee',
-		borderWidth: 1,
-		borderColor: '#6600ee',
+		backgroundColor: '#ff7373',
 		marginHorizontal: 5,
 	},
 	suggestItemView: {
 		flexDirection: 'row',
 		height: 40,
 		alignItems: 'center',
+		marginBottom: 10,
 	},
 	suggestItemText: {color: '#ffffff', padding: 5, paddingHorizontal: 10},
 });
