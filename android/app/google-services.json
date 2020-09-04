@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "550525364726",
+    "firebase_url": "https://chatbot-devil-ducks.firebaseio.com",
+    "project_id": "chatbot-devil-ducks",
+    "storage_bucket": "chatbot-devil-ducks.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:550525364726:android:d1e9afa6c61bd05c1fffd7",
+        "android_client_info": {
+          "package_name": "com.devilducks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "550525364726-no0i1pt4pl24dsp0npt3e22mvak8t0rd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devilducks",
+            "certificate_hash": "cceae68ed4a91711d07cae9c7e66ee2cfce96e96"
+          }
+        },
+        {
+          "client_id": "550525364726-kj5612atp622eip8k29dficsboghkd8r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3R5iyBD58qW1YFBiEQY2u_UgI2lbgkIQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "550525364726-kj5612atp622eip8k29dficsboghkd8r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

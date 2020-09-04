@@ -1,18 +1,29 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useMemo, useState, useEffect, useCallback} from 'react';
+import React from 'react';
 import {
 	View,
 	Text,
 	StyleSheet,
 	TouchableOpacity,
 	KeyboardAvoidingView,
-	Keyboard,
+	Image,
+	BackHandler,
 } from 'react-native';
-import {normalize} from '../../utils/Utils';
+import {normalize} from '../../../utils/Utils';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {GiftedChat, Bubble, InputToolbar, Send} from 'react-native-gifted-chat';
+import {
+	GiftedChat,
+	Bubble,
+	InputToolbar,
+	Send,
+	Composer,
+	MessageText,
+	Time,
+} from 'react-native-gifted-chat';
 import {FlatList} from 'react-native';
 import Axios from 'axios';
+import ApiString from '../../../constants/ApiString';
+import ScreenName from '../../../constants/ScreenName';
 const fakeData = [
 	{text: 'Cơ sở địa điểm học'},
 	{text: 'Hình thức tuyển sinh'},
@@ -28,32 +39,42 @@ export default class Chat extends React.Component {
 			data: [],
 			input: '',
 			isTyping: false,
-			isShowSuggest: true,
 		};
+		this.backHandler = null;
 	}
 
 	componentDidMount() {
-		Keyboard.addListener('keyboardDidShow', this.keyboardDidShow());
-		Keyboard.addListener('keyboardDidHide', this.keyboardDidHide());
+		this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+			BackHandler.exitApp();
+			return true;
+		});
 	}
 
-	keyboardDidShow = () => {
-		this.setState({isShowSuggest: false});
-	};
-	keyboardDidHide = () => {
-		this.setState({isShowSuggest: true});
-	};
+	componentWillUnmount() {
+		this.backHandler.remove();
+	}
+
 	header = () => (
 		<View style={styles.header}>
-			<View style={{flex: 1}} />
+			<View style={{width: normalize(24)}} />
+			<Image
+				source={require('../../../../assets/logo.png')}
+				style={{height: normalize(40), width: normalize(40)}}
+			/>
 			<Text style={styles.title}>Devil Ducks</Text>
 			<View style={{flex: 1, alignItems: 'flex-end'}}>
-				<TouchableOpacity style={styles.iconView}>
+				<TouchableOpacity
+					style={styles.iconView}
+					onPress={() => {
+						this.props.navigation.navigate(
+							ScreenName.Screen_User_Setting_screen,
+						);
+					}}>
 					<Entypo
 						name={'dots-three-vertical'}
 						size={24}
 						style={styles.icon}
-						color={'white'}
+						color={'#f6f5d7'}
 					/>
 				</TouchableOpacity>
 			</View>
@@ -64,9 +85,21 @@ export default class Chat extends React.Component {
 		<Bubble
 			{...props}
 			wrapperStyle={{
-				left: {backgroundColor: '#e1e1e1'},
-				right: {backgroundColor: '#ff7373'},
+				left: {backgroundColor: '#373737'},
+				right: {backgroundColor: '#ffe34f'},
 			}}
+			renderMessageText={(props2) => (
+				<MessageText
+					{...props2}
+					textStyle={{left: {color: '#f6f5d7'}, right: {color: '#383423'}}}
+				/>
+			)}
+			renderTime={(props2) => (
+				<Time
+					{...props2}
+					timeTextStyle={{left: {color: '#f6f5d7'}, right: {color: '#383423'}}}
+				/>
+			)}
 		/>
 	);
 
@@ -74,15 +107,24 @@ export default class Chat extends React.Component {
 		<InputToolbar
 			{...props}
 			containerStyle={{
-				backgroundColor: '#ff7373',
+				backgroundColor: '#18191a',
+				borderTopWidth: 0,
+				borderWidth: 0,
 				paddingVertical: 5,
 			}}
 			primaryStyle={{
-				borderRadius: 20,
+				borderRadius: 22,
 				borderWidth: 0,
 				marginHorizontal: 10,
-				backgroundColor: '#e1e1e1',
+				backgroundColor: '#373737',
 			}}
+			renderComposer={(props2) => (
+				<Composer
+					{...props2}
+					placeholderTextColor={'#b2b2b2'}
+					textInputStyle={{color: '#b2b2b2'}}
+				/>
+			)}
 		/>
 	);
 
@@ -90,9 +132,9 @@ export default class Chat extends React.Component {
 		<Send
 			{...props}
 			containerStyle={{
-				backgroundColor: '#e1e1e1',
+				backgroundColor: '#373737',
 				alignItems: 'center',
-				borderRadius: 20,
+				borderRadius: 22,
 			}}
 		/>
 	);
@@ -119,7 +161,7 @@ export default class Chat extends React.Component {
 				sender: 'Rasa',
 				message: textInput,
 			};
-			const url = 'http://34.82.215.81/webhooks/rest/webhook';
+			const url = ApiString.URL_Api_Post_Message;
 			Axios.post(url, body, config)
 				.then((response) => {
 					currentData.unshift({
@@ -146,10 +188,11 @@ export default class Chat extends React.Component {
 							this.setState({input});
 						}}
 						text={this.state.input}
-						showUserAvatar={false}
+						showUserAvatar={true}
 						renderAvatar={null}
 						isTyping={this.state.isTyping}
 						messages={this.state.data}
+						marginTop={normalize(60)}
 						onSend={() => {
 							this.onSend(this.state.input.trim());
 						}}
@@ -164,30 +207,25 @@ export default class Chat extends React.Component {
 						renderBubble={this.renderBubble}
 						renderInputToolbar={this.renderInputToolbar}
 						renderSend={this.renderSend}
-						renderChatFooter={() => {
-							if (!this.state.isShowSuggest) {
-								return <View />;
-							}
-							return (
-								<View style={styles.suggestItemView}>
-									<FlatList
-										data={fakeData}
-										horizontal
-										keyboardShouldPersistTaps={'always'}
-										keyExtractor={(item) => item.text}
-										renderItem={({item}) => (
-											<TouchableOpacity
-												style={styles.suggestItem}
-												onPress={() => {
-													this.onSend(item.text);
-												}}>
-												<Text style={styles.suggestItemText}>{item.text}</Text>
-											</TouchableOpacity>
-										)}
-									/>
-								</View>
-							);
-						}}
+						renderChatFooter={() => (
+							<View style={styles.suggestItemView}>
+								<FlatList
+									data={fakeData}
+									horizontal
+									keyboardShouldPersistTaps={'always'}
+									keyExtractor={(item) => item.text}
+									renderItem={({item}) => (
+										<TouchableOpacity
+											style={styles.suggestItem}
+											onPress={() => {
+												this.onSend(item.text);
+											}}>
+											<Text style={styles.suggestItemText}>{item.text}</Text>
+										</TouchableOpacity>
+									)}
+								/>
+							</View>
+						)}
 					/>
 				</View>
 			</KeyboardAvoidingView>
@@ -198,17 +236,21 @@ export default class Chat extends React.Component {
 const styles = StyleSheet.create({
 	container: {flex: 1},
 	header: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		zIndex: 999,
 		height: normalize(60),
 		elevation: 3,
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#ff7373',
+		backgroundColor: '#18191aee',
 	},
 	title: {
 		fontSize: normalize(20),
-		fontWeight: 'bold',
 		marginLeft: normalize(20),
-		color: 'white',
+		color: '#f6f5d7',
 	},
 	iconView: {
 		width: normalize(40),
@@ -217,20 +259,13 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		marginRight: normalize(10),
 	},
-	input: {
-		margin: normalize(10),
-		marginRight: normalize(10),
-		marginLeft: normalize(40),
-		borderRadius: 4,
-		borderWidth: 1,
-		borderColor: '#e0e0e0',
-		textAlignVertical: 'top',
-	},
-	chatView: {flex: 1, backgroundColor: '#3e454d'},
+	chatView: {flex: 1, backgroundColor: '#18191a'},
 	suggestItem: {
 		borderRadius: 16,
-		backgroundColor: '#ff7373',
 		marginHorizontal: 5,
+		backgroundColor: '#18191a',
+		borderColor: '#ffe34f',
+		borderWidth: 1,
 	},
 	suggestItemView: {
 		flexDirection: 'row',
@@ -238,5 +273,5 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		marginBottom: 10,
 	},
-	suggestItemText: {color: '#ffffff', padding: 5, paddingHorizontal: 10},
+	suggestItemText: {color: '#ffe34f', padding: 5, paddingHorizontal: 10},
 });
