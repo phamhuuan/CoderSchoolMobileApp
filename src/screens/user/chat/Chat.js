@@ -28,12 +28,42 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {APP_KEY} from '../../../constants/Constants';
 import firestore from '@react-native-firebase/firestore';
 import Colors from '../../../constants/Colors';
+import getChatData from '../../../api/getChatData';
+import addChat from '../../../api/addChat';
 const fakeData = [
 	{text: 'Cơ sở địa điểm học'},
 	{text: 'Hình thức tuyển sinh'},
 	{text: 'Thông tin chuyên ngành'},
 	{text: 'Tiếng anh dự bị'},
 	{text: 'Học phí'},
+];
+
+const fakeData2 = [
+	'greeting',
+	'location',
+	'tuition',
+	'english',
+	'ask_func_bot',
+	'advisory',
+	'recruitment',
+	'info_major',
+	'thanks',
+	'complain',
+	'bye_bye',
+	'jobs',
+	'love_bot',
+	'request_meet_staff',
+	'message_method',
+	'call_method',
+	'user_name',
+	'user_birth',
+	'user_phone_number',
+	'user_school',
+	'confirm',
+	'out_of_scope',
+	'deny',
+	'affirm',
+	'utter_fallback',
 ];
 
 export default class Chat extends React.Component {
@@ -57,7 +87,7 @@ export default class Chat extends React.Component {
 		});
 		AsyncStorage.getItem(APP_KEY.USER_PROFILE)
 			.then((userProfile) => {
-				console.warn(JSON.parse(userProfile));
+				console.log(JSON.parse(userProfile));
 				this.setState({userProfile: JSON.parse(userProfile)});
 				this.getChatData();
 			})
@@ -65,29 +95,25 @@ export default class Chat extends React.Component {
 	}
 
 	getChatData() {
-		firestore()
-			.collection('CHAT')
-			.doc(this.state.userProfile.user_id)
-			.collection('CHAT_LIST')
-			.orderBy('createdAt', 'desc')
-			.startAfter(this.state.startAfter)
-			.limit(10)
-			.get()
-			.then((querySnapshot) => {
-				console.warn('querySnapshot', querySnapshot);
-				let newData = [];
-				querySnapshot.docs.map((doc) => {
-					newData.push(doc.data());
-				});
+		getChatData(
+			this.state.userProfile.user_id,
+			this.state.startAfter,
+			10,
+			(data, totalChat) => {
 				this.setState({
-					data: [...this.state.data, ...newData],
-					startAfter: newData[newData.length - 1].createdAt,
-					loadEarlier: newData.length < 10 ? false : this.state.loadEarlier,
+					data: [...this.state.data, ...data],
+					startAfter: data[data.length - 1].createdAt,
+					loadEarlier:
+						totalChat - data.length - this.state.data.length > 0 ? true : false,
 				});
-			})
-			.catch((error) => {
-				console.warn('error', error);
-			});
+			},
+			() => {
+				this.setState({loadEarlier: false});
+			},
+			(name, message) => {
+				console.log(name, message);
+			},
+		);
 	}
 
 	componentWillUnmount() {
@@ -208,15 +234,7 @@ export default class Chat extends React.Component {
 			createdAt: new Date().getTime(),
 			_id: Math.random(),
 		};
-		firestore()
-			.collection('CHAT')
-			.doc(this.state.userProfile.user_id)
-			.collection('CHAT_LIST')
-			.add(newItem)
-			.then((querySnapshot) => {})
-			.catch((error) => {
-				console.warn(error);
-			});
+		addChat(this.state.userProfile.user_id, newItem);
 		currentData.unshift(newItem);
 		this.setState({data: [...currentData], input: '', isTyping: true}, () => {
 			const newBotItem = {
@@ -228,6 +246,7 @@ export default class Chat extends React.Component {
 				createdAt: new Date().getTime(),
 				_id: Math.random(),
 			};
+			addChat(this.state.userProfile.user_id, newBotItem);
 			firestore()
 				.collection('CHAT_ANALYSIS')
 				.add({
@@ -237,7 +256,7 @@ export default class Chat extends React.Component {
 					user_created_at: newItem.createdAt,
 					bot_message: newBotItem.text,
 					bot_created_at: newBotItem.createdAt,
-					intent: 'utter_fallback',
+					intent: fakeData2[Math.round(Math.random() * (fakeData2.length - 1))],
 				})
 				.then(() => {
 					currentData.unshift(newBotItem);

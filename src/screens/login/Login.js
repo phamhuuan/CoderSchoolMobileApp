@@ -65,21 +65,29 @@ const Login = ({navigation}) => {
 			emailInputValue,
 			passwordInputValue,
 			(user) => {
-				getUserInfo(user.uid, (userInfo) => {
-					AsyncStorage.setItem(
-						APP_KEY.USER_PROFILE,
-						JSON.stringify({...userInfo, keepLogin}),
-					).then(() => {
-						AsyncStorage.getItem(APP_KEY.USER_PROFILE).then((data) => {
-							console.warn(data);
+				getUserInfo(
+					user.uid,
+					(userInfo) => {
+						AsyncStorage.setItem(
+							APP_KEY.USER_PROFILE,
+							JSON.stringify({...userInfo, keepLogin}),
+						).then(() => {
+							AsyncStorage.getItem(APP_KEY.USER_PROFILE).then((data) => {
+								console.log(data);
+							});
 						});
-					});
-					if (userInfo.role === 'user') {
-						navigation.navigate(ScreenName.Screen_Chat_screen);
-					}
-				});
+						if (userInfo.role === 'user') {
+							navigation.navigate(ScreenName.Screen_Chat_screen);
+						}
+					},
+					(name, message) => {
+						Alert.alert(name, message);
+					},
+				);
 			},
-			() => {},
+			(name, message) => {
+				Alert.alert(name, message);
+			},
 		);
 	};
 

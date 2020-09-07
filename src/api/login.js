@@ -2,6 +2,7 @@ import auth from '@react-native-firebase/auth';
 import {Alert} from 'react-native';
 
 const login = (email, password, callback, handleError) => {
+	console.warn(email, password, callback, handleError);
 	auth()
 		.signInWithEmailAndPassword(email, password)
 		.then(({user}) => {
