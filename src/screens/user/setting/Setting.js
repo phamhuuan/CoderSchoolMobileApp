@@ -5,11 +5,14 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	SafeAreaView,
+	Alert,
 } from 'react-native';
 import {normalize} from '../../../utils/Utils';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-community/async-storage';
 import {APP_KEY} from '../../../constants/Constants';
+import Colors from '../../../constants/Colors';
+import logout from '../../../api/logout';
 
 const Setting = ({navigation}) => {
 	return (
@@ -23,7 +26,7 @@ const Setting = ({navigation}) => {
 					<Ionicons
 						name={'arrow-back'}
 						size={normalize(36)}
-						color={'#f6f5d7'}
+						color={Colors.color_006}
 					/>
 				</TouchableOpacity>
 				<Text style={styles.title}>Devil Ducks</Text>
@@ -32,8 +35,15 @@ const Setting = ({navigation}) => {
 				<TouchableOpacity
 					style={styles.choice}
 					onPress={() => {
-						AsyncStorage.removeItem(APP_KEY.USER_PROFILE);
-						navigation.popToTop();
+						logout(
+							() => {
+								AsyncStorage.removeItem(APP_KEY.USER_PROFILE);
+								navigation.popToTop();
+							},
+							(name, message) => {
+								Alert.alert(name, message);
+							},
+						);
 					}}>
 					<Text style={styles.choiceText}>Đăng xuất</Text>
 				</TouchableOpacity>
@@ -49,12 +59,12 @@ const styles = StyleSheet.create({
 		elevation: 3,
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#18191aee',
+		backgroundColor: Colors.color_003,
 	},
 	title: {
 		fontSize: normalize(20),
 		marginLeft: normalize(20),
-		color: '#f6f5d7',
+		color: Colors.color_006,
 	},
 	iconView: {
 		width: normalize(40),
@@ -68,7 +78,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		paddingHorizontal: normalize(18),
 		borderBottomWidth: 1,
-		backgroundColor: '#f6f5d7',
+		backgroundColor: Colors.color_006,
 	},
 	choiceText: {
 		fontSize: 18,

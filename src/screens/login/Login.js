@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
 	Text,
 	View,
@@ -16,193 +16,226 @@ import {
 } from 'react-native';
 import {normalize} from '../../utils/Utils';
 import {Input} from 'react-native-elements';
-import firestore from '@react-native-firebase/firestore';
+import ScreenName from '../../constants/ScreenName';
+import Colors from '../../constants/Colors';
+import login from '../../api/login';
+import getUserInfo from '../../api/getUserInfo';
 import AsyncStorage from '@react-native-community/async-storage';
 import {APP_KEY} from '../../constants/Constants';
-import ScreenName from '../../constants/ScreenName';
 
-export default class Login extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			emailInputValue: '',
-			passwordInputValue: '',
+const Login = ({navigation}) => {
+	const [emailInputValue, setEmailInputValue] = useState('');
+	const [passwordInputValue, setPasswordInputValue] = useState('');
+	const [keepLogin, setKeepLogin] = useState(true);
+	const rotation = new Animated.Value(-30);
+
+	useEffect(() => {
+		const duckAnimation = () => {
+			Animated.stagger(1000, [
+				Animated.timing(rotation, {
+					duration: 1000,
+					toValue: 30,
+					useNativeDriver: false,
+				}),
+				Animated.timing(rotation, {
+					duration: 1000,
+					toValue: -30,
+					useNativeDriver: false,
+				}),
+			]).start();
 		};
-		this.rotation = new Animated.Value(-30);
-		this.interval = null;
-	}
-
-	componentDidMount() {
-		this.interval = setInterval(() => {
-			this.duckAnimation();
+		const interval = setInterval(() => {
+			duckAnimation();
 		}, 2000);
-	}
+		return () => {
+			clearInterval(interval);
+		};
+	}, [rotation]);
 
-	componentWillUnmount() {
-		clearInterval(this.interval);
-	}
-
-	duckAnimation() {
-		Animated.stagger(1000, [
-			Animated.timing(this.rotation, {
-				duration: 1000,
-				toValue: 30,
-				useNativeDriver: false,
-			}),
-			Animated.timing(this.rotation, {
-				duration: 1000,
-				toValue: -30,
-				useNativeDriver: false,
-			}),
-		]).start();
-	}
-
-	onPressLogin = () => {
-		if (this.state.emailInputValue.trim() === '') {
+	const onPressLogin = () => {
+		if (emailInputValue.trim() === '') {
 			Alert.alert('', 'Bạn phải nhập email');
 			return;
 		}
-		if (this.state.passwordInputValue === '') {
+		if (passwordInputValue === '') {
 			Alert.alert('', 'Bạn phải nhập mật khẩu');
 			return;
 		}
-		firestore()
-			.collection('USER')
-			.where('email', '==', this.state.emailInputValue)
-			.get()
-			.then((querySnapshot) => {
-				if (querySnapshot.docs[0]) {
-					if (
-						this.state.passwordInputValue ===
-						querySnapshot.docs[0]._data.password
-					) {
-						AsyncStorage.setItem(
-							APP_KEY.USER_PROFILE,
-							JSON.stringify(querySnapshot.docs[0]._data),
-						);
-						if (querySnapshot.docs[0]._data.role === 'user') {
-							this.props.navigation.navigate(ScreenName.Screen_Chat_screen);
-						}
-					} else {
-						Alert.alert('', 'Sai mật khẩu');
+		login(
+			emailInputValue,
+			passwordInputValue,
+			(user) => {
+				getUserInfo(user.uid, (userInfo) => {
+					AsyncStorage.setItem(
+						APP_KEY.USER_PROFILE,
+						JSON.stringify({...userInfo, keepLogin}),
+					).then(() => {
+						AsyncStorage.getItem(APP_KEY.USER_PROFILE).then((data) => {
+							console.warn(data);
+						});
+					});
+					if (userInfo.role === 'user') {
+						navigation.navigate(ScreenName.Screen_Chat_screen);
 					}
-				} else {
-					Alert.alert('', 'Tài khoản không tồn tại');
-				}
-			})
-			.catch();
+				});
+			},
+			() => {},
+		);
 	};
 
-	render() {
-		return (
-			<SafeAreaView style={{flex: 1, backgroundColor: '#18191a'}}>
-				<KeyboardAvoidingView
+	const goToRegister = () => {
+		navigation.navigate(ScreenName.Screen_Register_screen);
+	};
+
+	return (
+		<SafeAreaView style={{flex: 1, backgroundColor: Colors.color_001}}>
+			<KeyboardAvoidingView
+				style={{flex: 1}}
+				behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+				<TouchableWithoutFeedback
 					style={{flex: 1}}
-					behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-					<TouchableWithoutFeedback
-						style={{flex: 1}}
-						onPress={() => {
-							Keyboard.dismiss();
-						}}>
-						<View style={{flex: 1}}>
-							<View
+					onPress={() => {
+						Keyboard.dismiss();
+					}}>
+					<View style={{flex: 1, justifyContent: 'flex-end'}}>
+						<View
+							style={{
+								height: normalize(300),
+								justifyContent: 'center',
+								alignItems: 'center',
+							}}>
+							<Animated.View style={{rotation: rotation}}>
+								<Image
+									source={require('../../../assets/logo.png')}
+									style={{height: normalize(200), width: normalize(200)}}
+								/>
+							</Animated.View>
+							<Text style={{color: Colors.color_004, fontSize: normalize(30)}}>
+								Devil Ducks
+							</Text>
+						</View>
+						<View style={styles.loginFormView}>
+							<View style={styles.loginTextView}>
+								<Text style={styles.loginText}>Đăng nhập</Text>
+							</View>
+							<Input
+								containerStyle={styles.inputContainerStyle}
+								inputStyle={styles.inputInputStyle}
+								labelStyle={styles.inputLabelStyle}
+								inputContainerStyle={styles.inputInputContainerStyle}
+								placeholder={'Email'}
+								placeholderTextColor={Colors.color_002}
+								keyboardType={'email-address'}
+								label={emailInputValue === '' ? null : 'Email'}
+								value={emailInputValue}
+								onChangeText={(text) => {
+									setEmailInputValue(text);
+								}}
+							/>
+							<Input
+								containerStyle={styles.inputContainerStyle}
+								inputStyle={styles.inputInputStyle}
+								labelStyle={styles.inputLabelStyle}
+								inputContainerStyle={styles.inputInputContainerStyle}
+								placeholder={'Mật khẩu'}
+								placeholderTextColor={Colors.color_002}
+								label={passwordInputValue === '' ? null : 'Mật khẩu'}
+								value={passwordInputValue}
+								onChangeText={(text) => {
+									setPasswordInputValue(text);
+								}}
+								secureTextEntry
+							/>
+							<TouchableOpacity
+								onPress={() => {
+									setKeepLogin(!keepLogin);
+								}}
 								style={{
-									flex: 1,
+									marginTop: normalize(5),
+									flexDirection: 'row',
 									justifyContent: 'center',
 									alignItems: 'center',
 								}}>
-								<Animated.View style={{rotation: this.rotation}}>
+								<Text style={{color: Colors.color_004}}>Duy trì đăng nhập</Text>
+								<View style={{width: normalize(5)}} />
+								{keepLogin ? (
 									<Image
-										source={require('../../../assets/logo.png')}
-										style={{height: normalize(150), width: normalize(150)}}
+										style={{width: normalize(24), height: normalize(24)}}
+										source={require('../../../assets/logo2.png')}
 									/>
-								</Animated.View>
-								<Text style={{color: '#b2b2b2', fontSize: normalize(30)}}>
-									Devil Ducks
+								) : (
+									<View
+										style={{
+											width: normalize(24),
+											height: normalize(24),
+											borderWidth: 1,
+											borderRadius: 4,
+											borderColor: Colors.color_004,
+										}}
+									/>
+								)}
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={styles.loginButton}
+								onPress={onPressLogin}>
+								<Text style={{fontSize: 18, color: Colors.color_007}}>
+									Đăng nhập
 								</Text>
-							</View>
-							<View
-								style={{
-									flex: 1.5,
-									backgroundColor: '#373737',
-									borderTopRightRadius: 36,
-									borderTopLeftRadius: 36,
-									alignItems: 'center',
-								}}>
-								<View
-									style={{
-										width: '100%',
-										paddingVertical: normalize(10),
-										alignItems: 'center',
-									}}>
-									<Text style={{color: '#b2b2b2', fontSize: normalize(30)}}>
-										Đăng nhập
-									</Text>
-								</View>
-								<Input
-									containerStyle={styles.inputContainerStyle}
-									inputStyle={styles.inputInputStyle}
-									labelStyle={styles.inputLabelStyle}
-									inputContainerStyle={styles.inputInputContainerStyle}
-									placeholder={'Email'}
-									placeholderTextColor={'#373737'}
-									keyboardType={'email-address'}
-									label={this.state.emailInputValue === '' ? null : 'Email'}
-									value={this.state.emailInputValue}
-									onChangeText={(text) => {
-										this.setState({emailInputValue: text});
-									}}
-								/>
-								<Input
-									containerStyle={styles.inputContainerStyle}
-									inputStyle={styles.inputInputStyle}
-									labelStyle={styles.inputLabelStyle}
-									inputContainerStyle={styles.inputInputContainerStyle}
-									placeholder={'Mật khẩu'}
-									placeholderTextColor={'#373737'}
-									label={
-										this.state.passwordInputValue === '' ? null : 'Mật khẩu'
-									}
-									value={this.state.passwordInputValue}
-									onChangeText={(text) => {
-										this.setState({passwordInputValue: text});
-									}}
-									secureTextEntry
-								/>
+							</TouchableOpacity>
+							<View style={{width: '90%', flexDirection: 'row'}}>
 								<TouchableOpacity
-									style={styles.loginButton}
-									onPress={this.onPressLogin}>
-									<Text style={{fontSize: 18, color: '#383423'}}>
-										Đăng nhập
+									style={{paddingVertical: normalize(3)}}
+									onPress={goToRegister}>
+									<Text style={{color: Colors.color_004}}>
+										Chưa có tài khoản? Đăng kí.
 									</Text>
 								</TouchableOpacity>
+								<View style={{flex: 1}} />
+								<TouchableOpacity style={{paddingVertical: normalize(3)}}>
+									<Text style={{color: Colors.color_004}}>Quên mật khẩu?</Text>
+								</TouchableOpacity>
 							</View>
+							<View style={{height: normalize(10)}} />
 						</View>
-					</TouchableWithoutFeedback>
-				</KeyboardAvoidingView>
-			</SafeAreaView>
-		);
-	}
-}
+					</View>
+				</TouchableWithoutFeedback>
+			</KeyboardAvoidingView>
+		</SafeAreaView>
+	);
+};
+
+export default Login;
 
 const styles = StyleSheet.create({
 	inputContainerStyle: {
 		marginTop: normalize(16),
-		backgroundColor: '#b2b2b2',
+		backgroundColor: Colors.color_004,
 		width: '90%',
 		borderRadius: 16,
 		height: normalize(60),
 	},
 	inputInputContainerStyle: {borderColor: 'transparent'},
-	inputInputStyle: {color: '#373737'},
-	inputLabelStyle: {color: '#373737'},
+	inputInputStyle: {color: Colors.color_002},
+	inputLabelStyle: {color: Colors.color_002},
 	loginButton: {
 		marginTop: normalize(16),
 		width: '90%',
-		backgroundColor: '#ffe34f',
-		height: normalize(60),
+		backgroundColor: Colors.color_005,
+		height: normalize(55),
 		borderRadius: 16,
 		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	loginTextView: {
+		width: '100%',
+		paddingVertical: normalize(10),
+		alignItems: 'center',
+	},
+	loginText: {color: Colors.color_004, fontSize: normalize(30)},
+	loginFormView: {
+		backgroundColor: Colors.color_002,
+		borderTopRightRadius: 36,
+		borderTopLeftRadius: 36,
 		alignItems: 'center',
 	},
 });

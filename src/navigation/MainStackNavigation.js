@@ -5,6 +5,7 @@ import Chat from '../screens/user/chat/Chat';
 import Login from '../screens/login/Login';
 import StartScreen from '../screens/startScreen/StartScreen';
 import UserSetting from '../screens/user/setting/Setting';
+import Register from '../screens/register/Register';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,11 @@ export default function MainStackNavigation() {
 			<Stack.Screen
 				name={ScreenName.Screen_Login_screen}
 				component={Login}
+				options={{headerShown: false}}
+			/>
+			<Stack.Screen
+				name={ScreenName.Screen_Register_screen}
+				component={Register}
 				options={{headerShown: false}}
 			/>
 			<Stack.Screen

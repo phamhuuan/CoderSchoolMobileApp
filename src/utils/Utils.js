@@ -16,3 +16,13 @@ export function is_url(str) {
 		return false;
 	}
 }
+
+export function validate_email(str) {
+	const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	return re.test(str);
+}
+
+export function validate_phone_number(str) {
+	const re = /^\d{10}$/;
+	return re.test(str);
+}
