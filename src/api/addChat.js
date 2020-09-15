@@ -8,7 +8,7 @@ const addChat = (user_id, data) => {
 		.add(data)
 		.then((querySnapshot) => {})
 		.catch((error) => {
-			console.warn(error);
+			console.log(error);
 		});
 };
 

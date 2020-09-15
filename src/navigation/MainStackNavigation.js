@@ -6,6 +6,10 @@ import Login from '../screens/login/Login';
 import StartScreen from '../screens/startScreen/StartScreen';
 import UserSetting from '../screens/user/setting/Setting';
 import Register from '../screens/register/Register';
+import AdminSetting from '../screens/admin/setting/Setting';
+import Analysis from '../screens/admin/analysis/Analysis';
+import MainChat from '../screens/admin/chat/MainChat';
+import AdminChat from '../screens/admin/chat/Chat';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +39,26 @@ export default function MainStackNavigation() {
 			<Stack.Screen
 				name={ScreenName.Screen_User_Setting_screen}
 				component={UserSetting}
+				options={{headerShown: false}}
+			/>
+			<Stack.Screen
+				name={ScreenName.Screen_Admin_Setting_screen}
+				component={AdminSetting}
+				options={{headerShown: false}}
+			/>
+			<Stack.Screen
+				name={ScreenName.Screen_Analysis_screen}
+				component={Analysis}
+				options={{headerShown: false}}
+			/>
+			<Stack.Screen
+				name={ScreenName.Screen_Admin_Main_Chat_screen}
+				component={MainChat}
+				options={{headerShown: false}}
+			/>
+			<Stack.Screen
+				name={ScreenName.Screen_Admin_Chat_screen}
+				component={AdminChat}
 				options={{headerShown: false}}
 			/>
 		</Stack.Navigator>

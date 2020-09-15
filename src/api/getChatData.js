@@ -7,7 +7,6 @@ const getChatData = (
 	limit,
 	hasDataCallback,
 	noDataCallback,
-	handleError,
 ) => {
 	firestore()
 		.collection(Table.CHAT)
@@ -24,27 +23,21 @@ const getChatData = (
 					.orderBy('createdAt', 'desc')
 					.startAfter(start_after)
 					.limit(limit)
-					.get()
-					.then((querySnapshot) => {
+					.onSnapshot((documentSnapshot2) => {
 						console.log(
 							'data',
-							querySnapshot.docs.map((x) => x.data()),
+							documentSnapshot2.docs.map((x) => x.data()),
 						);
 						hasDataCallback(
-							querySnapshot.docs.map((x) => x.data()),
+							documentSnapshot2.docs.map((x) => x.data()),
 							documentSnapshot.size,
 						);
-					})
-					.catch((error) => {
-						handleError(error.name, error.message);
-						console.log('error', error);
 					});
 			} else {
 				noDataCallback();
 				console.log('no chat data');
 			}
 		});
-	return [];
 };
 
 export default getChatData;

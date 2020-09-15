@@ -126,7 +126,7 @@ const Register = ({navigation}) => {
 						setHidePassword(false);
 					}}
 					style={styles.eyeIcon}>
-					<Feather name={'eye'} size={normalize(24)} color={Colors.color_002} />
+					<Feather name={'eye'} size={normalize(24)} color={Colors.color_006} />
 				</TouchableOpacity>
 			);
 		} else {
@@ -151,7 +151,7 @@ const Register = ({navigation}) => {
 	};
 
 	return (
-		<SafeAreaView style={{flex: 1, backgroundColor: Colors.color_001}}>
+		<SafeAreaView style={{flex: 1, backgroundColor: Colors.color_007}}>
 			<KeyboardAvoidingView
 				style={{flex: 1}}
 				behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -170,13 +170,17 @@ const Register = ({navigation}) => {
 								}}>
 								<Animated.View style={{rotation: rotation}}>
 									<Image
-										source={require('../../../assets/logo.png')}
+										source={require('../../../assets/logo3.png')}
 										style={{height: normalize(150), width: normalize(150)}}
 									/>
 								</Animated.View>
 								<Text
-									style={{color: Colors.color_004, fontSize: normalize(30)}}>
-									Devil Ducks
+									style={{
+										color: Colors.color_005,
+										fontSize: normalize(24),
+										fontFamily: 'Comfortaa-Regular',
+									}}>
+									Chào mừng đến với DuckBot
 								</Text>
 							</View>
 							<View style={styles.loginFormView}>
@@ -190,7 +194,7 @@ const Register = ({navigation}) => {
 										labelStyle={styles.inputLabelStyle}
 										inputContainerStyle={styles.inputInputContainerStyle}
 										placeholder={'Họ và tên'}
-										placeholderTextColor={Colors.color_002}
+										placeholderTextColor={Colors.color_006}
 										label={username === '' ? null : 'Họ và tên'}
 										value={username}
 										onChangeText={(text) => {
@@ -205,7 +209,7 @@ const Register = ({navigation}) => {
 										labelStyle={styles.inputLabelStyle}
 										inputContainerStyle={styles.inputInputContainerStyle}
 										placeholder={'Email'}
-										placeholderTextColor={Colors.color_002}
+										placeholderTextColor={Colors.color_006}
 										keyboardType={'email-address'}
 										label={emailInputValue === '' ? null : 'Email'}
 										value={emailInputValue}
@@ -221,7 +225,7 @@ const Register = ({navigation}) => {
 										labelStyle={styles.inputLabelStyle}
 										inputContainerStyle={styles.inputInputContainerStyle}
 										placeholder={'Số điện thoại'}
-										placeholderTextColor={Colors.color_002}
+										placeholderTextColor={Colors.color_006}
 										keyboardType={'number-pad'}
 										label={
 											phonenumberInputValue === '' ? null : 'Số điện thoại'
@@ -239,7 +243,7 @@ const Register = ({navigation}) => {
 										labelStyle={styles.inputLabelStyle}
 										inputContainerStyle={styles.inputInputContainerStyle}
 										placeholder={'Mật khẩu'}
-										placeholderTextColor={Colors.color_002}
+										placeholderTextColor={Colors.color_006}
 										label={passwordInputValue === '' ? null : 'Mật khẩu'}
 										value={passwordInputValue}
 										onChangeText={(text) => {
@@ -256,7 +260,7 @@ const Register = ({navigation}) => {
 										labelStyle={styles.inputLabelStyle}
 										inputContainerStyle={styles.inputInputContainerStyle}
 										placeholder={'Nhập lại mật khẩu'}
-										placeholderTextColor={Colors.color_002}
+										placeholderTextColor={Colors.color_006}
 										label={
 											password2InputValue === '' ? null : 'Nhập lại mật khẩu'
 										}
@@ -271,7 +275,12 @@ const Register = ({navigation}) => {
 								<TouchableOpacity
 									style={styles.loginButton}
 									onPress={onPressRegister}>
-									<Text style={{fontSize: 18, color: Colors.color_007}}>
+									<Text
+										style={{
+											fontSize: 18,
+											color: Colors.color_006,
+											fontFamily: 'Comfortaa-Regular',
+										}}>
 										Đăng kí
 									</Text>
 								</TouchableOpacity>
@@ -279,7 +288,11 @@ const Register = ({navigation}) => {
 									<TouchableOpacity
 										style={{paddingVertical: normalize(3)}}
 										onPress={goToLogin}>
-										<Text style={{color: Colors.color_004}}>
+										<Text
+											style={{
+												color: Colors.color_006,
+												fontFamily: 'Comfortaa-Regular',
+											}}>
 											Đã có tài khoản? Đăng nhập.
 										</Text>
 									</TouchableOpacity>
@@ -297,17 +310,17 @@ const Register = ({navigation}) => {
 const styles = StyleSheet.create({
 	inputView: {width: '90%', marginTop: normalize(16)},
 	inputContainerStyle: {
-		backgroundColor: Colors.color_004,
+		backgroundColor: Colors.color_007,
 		borderRadius: 16,
 		height: normalize(60),
 	},
 	inputInputContainerStyle: {borderColor: 'transparent'},
-	inputInputStyle: {color: Colors.color_002},
-	inputLabelStyle: {color: Colors.color_002},
+	inputInputStyle: {color: Colors.color_006, fontFamily: 'Comfortaa-Regular'},
+	inputLabelStyle: {color: Colors.color_006, fontFamily: 'Comfortaa-Regular'},
 	loginButton: {
 		marginTop: normalize(16),
 		width: '90%',
-		backgroundColor: Colors.color_005,
+		backgroundColor: Colors.color_002,
 		height: normalize(55),
 		borderRadius: 16,
 		justifyContent: 'center',
@@ -318,9 +331,13 @@ const styles = StyleSheet.create({
 		paddingVertical: normalize(10),
 		alignItems: 'center',
 	},
-	loginText: {color: Colors.color_004, fontSize: normalize(30)},
+	loginText: {
+		color: Colors.color_006,
+		fontSize: normalize(30),
+		fontFamily: 'Comfortaa-Regular',
+	},
 	loginFormView: {
-		backgroundColor: Colors.color_002,
+		backgroundColor: Colors.color_009,
 		borderTopRightRadius: 36,
 		borderTopLeftRadius: 36,
 		alignItems: 'center',

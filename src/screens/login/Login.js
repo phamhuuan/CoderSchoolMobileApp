@@ -79,6 +79,9 @@ const Login = ({navigation}) => {
 						if (userInfo.role === 'user') {
 							navigation.navigate(ScreenName.Screen_Chat_screen);
 						}
+						if (userInfo.role === 'admin') {
+							navigation.navigate(ScreenName.Screen_Analysis_screen);
+						}
 					},
 					(name, message) => {
 						Alert.alert(name, message);
@@ -96,7 +99,7 @@ const Login = ({navigation}) => {
 	};
 
 	return (
-		<SafeAreaView style={{flex: 1, backgroundColor: Colors.color_001}}>
+		<SafeAreaView style={{flex: 1, backgroundColor: Colors.color_007}}>
 			<KeyboardAvoidingView
 				style={{flex: 1}}
 				behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -114,12 +117,17 @@ const Login = ({navigation}) => {
 							}}>
 							<Animated.View style={{rotation: rotation}}>
 								<Image
-									source={require('../../../assets/logo.png')}
+									source={require('../../../assets/logo3.png')}
 									style={{height: normalize(200), width: normalize(200)}}
 								/>
 							</Animated.View>
-							<Text style={{color: Colors.color_004, fontSize: normalize(30)}}>
-								Devil Ducks
+							<Text
+								style={{
+									color: Colors.color_005,
+									fontSize: normalize(24),
+									fontFamily: 'Comfortaa-Regular',
+								}}>
+								Chào mừng đến với DuckBot
 							</Text>
 						</View>
 						<View style={styles.loginFormView}>
@@ -132,7 +140,7 @@ const Login = ({navigation}) => {
 								labelStyle={styles.inputLabelStyle}
 								inputContainerStyle={styles.inputInputContainerStyle}
 								placeholder={'Email'}
-								placeholderTextColor={Colors.color_002}
+								placeholderTextColor={Colors.color_006}
 								keyboardType={'email-address'}
 								label={emailInputValue === '' ? null : 'Email'}
 								value={emailInputValue}
@@ -146,7 +154,7 @@ const Login = ({navigation}) => {
 								labelStyle={styles.inputLabelStyle}
 								inputContainerStyle={styles.inputInputContainerStyle}
 								placeholder={'Mật khẩu'}
-								placeholderTextColor={Colors.color_002}
+								placeholderTextColor={Colors.color_006}
 								label={passwordInputValue === '' ? null : 'Mật khẩu'}
 								value={passwordInputValue}
 								onChangeText={(text) => {
@@ -164,12 +172,18 @@ const Login = ({navigation}) => {
 									justifyContent: 'center',
 									alignItems: 'center',
 								}}>
-								<Text style={{color: Colors.color_004}}>Duy trì đăng nhập</Text>
+								<Text
+									style={{
+										color: Colors.color_006,
+										fontFamily: 'Comfortaa-Regular',
+									}}>
+									Duy trì đăng nhập
+								</Text>
 								<View style={{width: normalize(5)}} />
 								{keepLogin ? (
 									<Image
 										style={{width: normalize(24), height: normalize(24)}}
-										source={require('../../../assets/logo2.png')}
+										source={require('../../../assets/logo3.png')}
 									/>
 								) : (
 									<View
@@ -178,7 +192,7 @@ const Login = ({navigation}) => {
 											height: normalize(24),
 											borderWidth: 1,
 											borderRadius: 4,
-											borderColor: Colors.color_004,
+											borderColor: Colors.color_006,
 										}}
 									/>
 								)}
@@ -186,7 +200,12 @@ const Login = ({navigation}) => {
 							<TouchableOpacity
 								style={styles.loginButton}
 								onPress={onPressLogin}>
-								<Text style={{fontSize: 18, color: Colors.color_007}}>
+								<Text
+									style={{
+										fontSize: 18,
+										color: Colors.color_006,
+										fontFamily: 'Comfortaa-Regular',
+									}}>
 									Đăng nhập
 								</Text>
 							</TouchableOpacity>
@@ -194,13 +213,23 @@ const Login = ({navigation}) => {
 								<TouchableOpacity
 									style={{paddingVertical: normalize(3)}}
 									onPress={goToRegister}>
-									<Text style={{color: Colors.color_004}}>
+									<Text
+										style={{
+											color: Colors.color_006,
+											fontFamily: 'Comfortaa-Regular',
+										}}>
 										Chưa có tài khoản? Đăng kí.
 									</Text>
 								</TouchableOpacity>
 								<View style={{flex: 1}} />
 								<TouchableOpacity style={{paddingVertical: normalize(3)}}>
-									<Text style={{color: Colors.color_004}}>Quên mật khẩu?</Text>
+									<Text
+										style={{
+											color: Colors.color_006,
+											fontFamily: 'Comfortaa-Regular',
+										}}>
+										Quên mật khẩu?
+									</Text>
 								</TouchableOpacity>
 							</View>
 							<View style={{height: normalize(10)}} />
@@ -217,18 +246,18 @@ export default Login;
 const styles = StyleSheet.create({
 	inputContainerStyle: {
 		marginTop: normalize(16),
-		backgroundColor: Colors.color_004,
+		backgroundColor: Colors.color_007,
 		width: '90%',
 		borderRadius: 16,
 		height: normalize(60),
 	},
 	inputInputContainerStyle: {borderColor: 'transparent'},
-	inputInputStyle: {color: Colors.color_002},
-	inputLabelStyle: {color: Colors.color_002},
+	inputInputStyle: {color: Colors.color_006, fontFamily: 'Comfortaa-Regular'},
+	inputLabelStyle: {color: Colors.color_006, fontFamily: 'Comfortaa-Regular'},
 	loginButton: {
 		marginTop: normalize(16),
 		width: '90%',
-		backgroundColor: Colors.color_005,
+		backgroundColor: Colors.color_002,
 		height: normalize(55),
 		borderRadius: 16,
 		justifyContent: 'center',
@@ -239,9 +268,13 @@ const styles = StyleSheet.create({
 		paddingVertical: normalize(10),
 		alignItems: 'center',
 	},
-	loginText: {color: Colors.color_004, fontSize: normalize(30)},
+	loginText: {
+		color: Colors.color_006,
+		fontSize: normalize(30),
+		fontFamily: 'Comfortaa-Regular',
+	},
 	loginFormView: {
-		backgroundColor: Colors.color_002,
+		backgroundColor: Colors.color_009,
 		borderTopRightRadius: 36,
 		borderTopLeftRadius: 36,
 		alignItems: 'center',

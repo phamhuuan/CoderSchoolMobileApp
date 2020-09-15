@@ -29,7 +29,11 @@ const StartScreen = ({navigation}) => {
 								},
 							);
 						} else {
-							navigation.navigate(ScreenName.Screen_Chat_screen);
+							if (JSON.parse(userProfile).role === 'user') {
+								navigation.navigate(ScreenName.Screen_Chat_screen);
+							} else if (JSON.parse(userProfile).role === 'admin') {
+								navigation.navigate(ScreenName.Screen_Analysis_screen);
+							}
 						}
 					}
 				})
@@ -59,10 +63,10 @@ const StartScreen = ({navigation}) => {
 				flex: 1,
 				justifyContent: 'center',
 				alignItems: 'center',
-				backgroundColor: Colors.color_001,
+				backgroundColor: Colors.color_007,
 			}}>
 			<Image
-				source={require('../../../assets/logo.png')}
+				source={require('../../../assets/logo3.png')}
 				style={{height: normalize(250), width: normalize(250)}}
 			/>
 		</View>
